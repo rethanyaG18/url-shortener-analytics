@@ -1,41 +1,33 @@
-# SnapLink — URL Shortener with Analytics
+# 🚀 SnapLink — Advanced URL Shortener & Analytics Platform
 
-> A production-ready full-stack URL shortener with click tracking, browser/device analytics, QR code generation, and a modern dark-mode SaaS dashboard.
+> **Live Demo:** [https://url-shortener-analytics-psi.vercel.app](https://url-shortener-analytics-psi.vercel.app)  
+> **Demo Video:** [Insert Loom/YouTube Link Here]  
 
----
-
-## 📋 Project Overview
-
-SnapLink allows authenticated users to:
-- Shorten any valid URL into a compact short link
-- Track every click with metadata (browser, device, OS, IP, timestamp)
-- Visualise analytics with interactive charts
-- Generate and download QR codes for any link
-- Set custom aliases and optional expiry dates
+A production-ready full-stack SaaS application built for the Katomaran Hackathon. It provides secure URL shortening, detailed click tracking (browser, OS, device, IP), interactive charting, and custom aliases.
 
 ---
 
-## ✨ Features
+## 🏆 Hackathon Requirements Checklist
 
-### Mandatory
-- ✅ **User Authentication** — Signup / Login with JWT + bcrypt password hashing
-- ✅ **Protected Dashboard** — Only your links visible, JWT-guarded routes
-- ✅ **URL Shortening** — Unique 6-char short codes, collision-safe generation
-- ✅ **URL Validation** — Client and server side (must be http/https)
-- ✅ **Server-side Redirect** — `GET /:shortCode` → 302 redirect
-- ✅ **Dashboard** — View all links with original URL, short URL, date, click count
-- ✅ **Copy URL** — One-click clipboard copy
-- ✅ **Delete URL** — With ownership check
-- ✅ **Analytics Page** — Total clicks, last visited, recent history, browser/device/OS charts
-- ✅ **Responsive UI** — Mobile-first, tested at 375px and 1280px
+This project was built to strictly adhere to the Katomaran Hackathon Problem Statement. Here is how the requirements were met:
 
-### Bonus
-- ✅ **Custom Alias** — Set your own short code (alphanumeric, 3-20 chars)
-- ✅ **QR Code Generation** — Downloadable PNG QR code per link
-- ✅ **Expiry Dates** — Links stop redirecting after set datetime
-- ✅ **Public Stats Page** — `/stats/:shortCode` — no login required
-- ✅ **Daily Click Trends** — 7-day and 30-day area charts with toggle
-- ✅ **Device/Browser/OS Pie Charts** — Powered by Recharts
+### Mandatory Requirements
+- [x] **Frontend Stack**: Built with React (Vite), Tailwind CSS v4, and React Router.
+- [x] **Backend Stack**: Built with Node.js and Express.js using clean layered architecture.
+- [x] **Database**: Powered by Supabase (PostgreSQL) using proper relational schemas (`users`, `urls`, `visits`).
+- [x] **Authentication**: Custom JWT implementation with `bcryptjs` for secure password hashing.
+- [x] **Protected Routes**: React Context + Guard components ensure users only access their own links.
+- [x] **URL Shortening**: Collision-safe 6-character generation (`nanoid`) with HTTP/HTTPS validation.
+- [x] **Redirection**: HTTP `302` redirects capturing metadata before routing.
+- [x] **Dashboard UI**: Modern glassmorphism aesthetic with URL listing, creation, and deletion.
+- [x] **Analytics UI**: Integrated `Recharts` for visually stunning 7-day/30-day area trends and pie charts.
+- [x] **AI Workflow Documentation**: Fully planned and coded using AI-assisted workflow (see AI section below).
+
+### Bonus Features Implemented
+- [x] **Custom Aliases**: Users can define their own branded short URLs (e.g., `snap.link/my-brand`).
+- [x] **QR Code Generation**: Instantly generates downloadable PNG QR codes using `qrcode.react`.
+- [x] **Link Expiry Dates**: Users can set an expiration time; expired links return a 410 error.
+- [x] **Public Stats Page**: Shareable public link (`/stats/:shortCode`) to show off click counts securely.
 
 ---
 
@@ -43,245 +35,117 @@ SnapLink allows authenticated users to:
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18 + Vite |
-| Styling | Tailwind CSS v4 |
-| Routing | React Router v6 |
-| HTTP | Axios |
-| Notifications | React Hot Toast |
-| Charts | Recharts |
-| QR Code | qrcode.react |
-| Backend | Node.js + Express.js |
-| Auth | JWT (`jsonwebtoken`) + `bcryptjs` |
-| DB | Supabase PostgreSQL |
-| UA Parsing | `ua-parser-js` |
-| ID Generation | `nanoid` |
+| **Frontend** | React 18, Vite, Tailwind CSS v4, React Router v6 |
+| **Data Viz** | Recharts (Area & Pie charts) |
+| **Backend** | Node.js, Express.js, JWT, bcryptjs |
+| **Database** | Supabase (PostgreSQL) |
+| **Utilities** | Axios, React Hot Toast, `ua-parser-js`, `nanoid` |
+| **Deployment** | Vercel (Frontend), Render.com (Backend) |
 
 ---
 
-## 🏗 Architecture Diagram
+## 🏗 Architecture & Data Flow
 
 ```mermaid
 graph TB
-    subgraph "Frontend (Vercel)"
-        A[React + Vite] --> B[AuthContext]
-        A --> C[React Router]
-        C --> D[Login / Signup]
-        C --> E[Dashboard]
-        C --> F[Analytics Page]
-        C --> G[Public Stats]
-        E --> H[Axios API Service]
-        F --> H
+    subgraph "Frontend (Vercel / React)"
+        A[React App] --> B[AuthContext & Guard]
+        A --> C[Axios API Client + JWT Interceptor]
+        B --> D[Dashboard / Analytics]
     end
 
-    subgraph "Backend (Render)"
-        I[Express.js] --> J[Auth Routes\n/api/auth]
-        I --> K[URL Routes\n/api/urls]
-        I --> L[Analytics Routes\n/api/analytics]
-        I --> M[Redirect Route\n/:shortCode]
-        J --> N[JWT Middleware]
-        K --> N
-        L --> N
-        M --> O[Visit Tracker\nua-parser-js]
+    subgraph "Backend (Render.com / Express)"
+        E[API Gateway / Router] --> F[Auth Controller]
+        E --> G[URL Controller]
+        E --> H[Analytics Controller]
+        E --> I[Redirect Controller + UA Parser]
+        F & G & H & I --> J[Service Layer]
     end
 
-    subgraph "Database (Supabase)"
-        P[(users)]
-        Q[(urls)]
-        R[(visits)]
-        Q --> R
-        P --> Q
+    subgraph "Database (Supabase / Postgres)"
+        K[(users table)]
+        L[(urls table)]
+        M[(visits table)]
+        L --> M
+        K --> L
     end
 
-    H -->|REST API| I
-    I -->|Supabase Client| P
-    I -->|Supabase Client| Q
-    I -->|Supabase Client| R
+    C -- "REST over HTTPS" --> E
+    J -- "PostgREST" --> K
 ```
 
 ---
 
 ## 🗄 Database Schema
 
-### `users`
+**1. Users Table**
 ```sql
-id            UUID  PRIMARY KEY DEFAULT gen_random_uuid()
-name          TEXT  NOT NULL
-email         TEXT  UNIQUE NOT NULL
-password_hash TEXT  NOT NULL
-created_at    TIMESTAMPTZ DEFAULT NOW()
+id (UUID, PK), name (TEXT), email (TEXT, UNIQUE), password_hash (TEXT), created_at (TIMESTAMPTZ)
 ```
 
-### `urls`
+**2. URLs Table**
 ```sql
-id           UUID        PRIMARY KEY DEFAULT gen_random_uuid()
-user_id      UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE
-original_url TEXT        NOT NULL
-short_code   VARCHAR(50) UNIQUE NOT NULL
-custom_alias VARCHAR(50) UNIQUE
-expires_at   TIMESTAMPTZ
-created_at   TIMESTAMPTZ DEFAULT NOW()
+id (UUID, PK), user_id (UUID, FK -> users), original_url (TEXT), short_code (VARCHAR), custom_alias (VARCHAR), expires_at (TIMESTAMPTZ), created_at (TIMESTAMPTZ)
 ```
 
-### `visits`
+**3. Visits Table** (Records every individual click)
 ```sql
-id          UUID        PRIMARY KEY DEFAULT gen_random_uuid()
-url_id      UUID        NOT NULL REFERENCES urls(id) ON DELETE CASCADE
-visited_at  TIMESTAMPTZ DEFAULT NOW()
-ip_address  TEXT
-browser     TEXT
-device      TEXT
-os          TEXT
+id (UUID, PK), url_id (UUID, FK -> urls), visited_at (TIMESTAMPTZ), ip_address (TEXT), browser (TEXT), device (TEXT), os (TEXT)
 ```
 
 ---
 
-## 📡 API Documentation
-
-### Auth
-
-| Method | Endpoint | Body | Response |
-|---|---|---|---|
-| POST | `/api/auth/signup` | `{ name, email, password }` | `{ user, token }` |
-| POST | `/api/auth/login` | `{ email, password }` | `{ user, token }` |
-
-### URLs _(requires `Authorization: Bearer <token>`_)
-
-| Method | Endpoint | Body | Response |
-|---|---|---|---|
-| POST | `/api/urls` | `{ original_url, custom_alias?, expires_at? }` | `{ url }` |
-| GET | `/api/urls` | — | `{ urls[] }` |
-| DELETE | `/api/urls/:id` | — | `{ message }` |
-
-### Analytics _(requires auth)_
-
-| Method | Endpoint | Response |
-|---|---|---|
-| GET | `/api/analytics/:id` | Full analytics object with charts data |
-| GET | `/api/analytics/public/:shortCode` | Public click count + last visited |
-
-### Redirect _(public)_
-
-| Method | Endpoint | Response |
-|---|---|---|
-| GET | `/:shortCode` | 302 redirect to original URL |
-
----
-
-## 🚀 Installation & Setup
+## 🚀 Local Setup Instructions
 
 ### Prerequisites
 - Node.js ≥ 18
-- A [Supabase](https://supabase.com) project (free tier works)
+- A Supabase Project (for PostgreSQL)
 
-### 1. Clone the repository
+### 1. Clone & Database Setup
 ```bash
-git clone https://github.com/your-username/snaplink.git
-cd snaplink
+git clone https://github.com/rethanyaG18/url-shortener-analytics.git
+cd url-shortener-analytics
 ```
+*Run the SQL found in `backend/src/database/migrations/001_init.sql` inside your Supabase SQL Editor.*
 
-### 2. Set up the database
-1. Go to your Supabase project → **SQL Editor**
-2. Paste and run the contents of `backend/src/database/migrations/001_init.sql`
-
-### 3. Configure the backend
+### 2. Run Backend
 ```bash
 cd backend
-cp .env.example .env
-# Fill in your values in .env
 npm install
+# Create a .env file using the provided .env.example
 npm run dev
 ```
 
-### 4. Configure the frontend
+### 3. Run Frontend
 ```bash
 cd frontend
-cp .env.example .env
-# Set VITE_API_URL=http://localhost:5000
 npm install
+# Ensure .env has VITE_API_URL=http://localhost:5000
 npm run dev
 ```
 
-Open http://localhost:5173
+Visit `http://localhost:5173` in your browser.
 
 ---
 
-## 🔐 Environment Variables
+## 💡 Assumptions & Design Decisions
 
-### Backend `.env`
-```
-PORT=5000
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-JWT_SECRET=your-super-secret-jwt-key-min-32-chars
-BASE_URL=http://localhost:5000
-FRONTEND_URL=http://localhost:5173
-NODE_ENV=development
-```
-
-### Frontend `.env`
-```
-VITE_API_URL=http://localhost:5000
-```
+1. **Short code length**: Defaults to 6 characters. The system retries up to 10 times in the highly unlikely event of a collision.
+2. **Redirect Status**: Issues `HTTP 302` (Temporary) rather than `301` (Permanent) so browsers do not cache the redirect. This ensures every click is tracked accurately.
+3. **CORS Policy**: Configured to dynamically accept requests from the deployed Vercel frontend, preventing strict origin mismatch blocks.
+4. **Delete Cascade**: Deleting a URL automatically deletes all associated visits via `ON DELETE CASCADE` in PostgreSQL.
+5. **Security**: Supabase connection uses the backend `service-role` key. The frontend never communicates with Supabase directly, acting entirely through the Express backend gatekeeper.
 
 ---
 
-## 🌐 Deployment
+## 🤖 AI Planning & Workflow Document
 
-### Backend → Render
-1. Push `backend/` to a GitHub repo
-2. Create a new **Web Service** on [Render](https://render.com)
-3. Set **Build Command**: `npm install`
-4. Set **Start Command**: `node index.js`
-5. Add all environment variables from `.env.example`
-6. Update `FRONTEND_URL` to your Vercel URL
-
-### Frontend → Vercel
-1. Push `frontend/` to GitHub
-2. Import on [Vercel](https://vercel.com)
-3. Set `VITE_API_URL` = your Render backend URL
-4. Deploy — Vercel auto-detects Vite
-
----
-
-## 📸 Screenshots
-
-_Add screenshots here after deployment_
-
-| Page | Description |
-|---|---|
-| Home | Landing page with hero and feature grid |
-| Dashboard | URL management with stats overview |
-| Analytics | Charts, visit table, browser/device breakdown |
-| Login/Signup | Auth forms with validation |
-
----
-
-## 💡 Assumptions Made
-
-1. **Short code default length** is 6 alphanumeric characters (nanoid), retrying up to 10 times on collision
-2. **Redirect** issues HTTP 302 (not 301) to prevent browser caching in development/testing
-3. **IP detection** uses `X-Forwarded-For` header (standard on Render/proxied deployments)
-4. **JWT expiry** is 7 days; refresh tokens are out of scope for this hackathon
-5. **Supabase service-role key** is used backend-only — never exposed to the browser
-6. **RLS (Row Level Security)** is not configured on Supabase tables because all DB access goes through the backend using the service-role key
-7. **Visit tracking** is fire-and-forget (async) on the redirect route to keep redirect latency minimal
-8. **Public analytics** (`/stats/:shortCode`) returns only click count and last visited — not raw visit data — for privacy
-9. **Delete** cascades to visits via `ON DELETE CASCADE` in the schema
-10. **Custom alias** replaces the auto-generated short code (not stored separately)
-
----
-
-## 🤖 AI Planning Document
-
-This project was planned and built using AI-assisted code generation. The workflow:
-
-1. **Read problem statement** → extracted all mandatory and bonus requirements
-2. **Architecture design** → chose React + Express + Supabase for rapid full-stack development
-3. **Schema design** → modelled `users`, `urls`, `visits` with proper foreign keys and indexes
-4. **Backend first** → clean architecture with controllers/services/routes separation
-5. **Frontend second** → context → services → components → pages
-6. **Bonus features** → custom alias, QR code, expiry, public stats added as layered enhancements
+This project was built using an advanced AI-assisted workflow:
+1. **Requirements Extraction**: The problem statement PDF was ingested, breaking down all mandatory vs. bonus requirements.
+2. **Architecture Blueprinting**: The relational database schema and API route structures were mapped out before writing code.
+3. **Backend First**: The Express backend was built layer-by-layer (Routes -> Controllers -> Services), testing collision logic and JWT middleware.
+4. **Frontend Implementation**: The Vite/React environment was scaffolded, implementing Context API for global auth state, followed by UI components.
+5. **Polish & Analytics**: Recharts was integrated, mapping complex PostgreSQL aggregation queries into beautiful frontend data visualisations.
 
 ---
 
