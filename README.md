@@ -1,7 +1,7 @@
 # 🚀 SnapLink — Advanced URL Shortener & Analytics Platform
 
 > **Live Demo:** [https://url-shortener-analytics-psi.vercel.app](https://url-shortener-analytics-psi.vercel.app)  
-> **Demo Video:** [Insert Loom/YouTube Link Here]  
+> **Demo Video:** https://www.loom.com/share/b09ef435041e4816b01c6f792a111056 
 
 A production-ready full-stack SaaS application built for the Katomaran Hackathon. It provides secure URL shortening, detailed click tracking (browser, OS, device, IP), interactive charting, and custom aliases.
 
