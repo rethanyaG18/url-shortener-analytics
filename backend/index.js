@@ -18,17 +18,9 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 // ─── CORS ────────────────────────────────────────────────────
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-  'https://your-app.vercel.app', // update after deploy
-];
 app.use(
   cors({
-    origin: (origin, cb) => {
-      // allow requests with no origin (e.g. curl, Postman)
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      cb(new Error('Not allowed by CORS'));
-    },
+    origin: true, // dynamically reflects the requesting origin
     credentials: true,
   })
 );
